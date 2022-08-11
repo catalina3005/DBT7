@@ -4,18 +4,28 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 
-public interface ProductRepository extends JpaRepository<Product, Integer> {
+@Repository
+public interface ProductRepository extends JpaRepository<Product,Integer> {
+
     List<Product> findAll();
-    @Transactional
+
     @Modifying
-    @Query(value = "UPDATE Product p set p.initialStock = p.initialStock + 1 WHERE p.id = :id")
-    void incrementStock(@Param("id") Integer id);
     @Transactional
+    @Query("update Product u set u.initialStock = :initialStock where u.id = :id")
+    void updateProduct(@Param(value = "id") Integer id, @Param(value = "initialStock") Integer initialStock);
+
     @Modifying
-    @Query(value = "UPDATE Product p set p.initialStock = p.initialStock - 1 WHERE p.id = :id")
-    void decrementStock(@Param("id") Integer id);
+    @Transactional
+    @Query("UPDATE Product t set t.initialStock = t.initialStock - 1 WHERE t.id = :id")
+    void updateStock(Integer id);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Product t set t.initialStock = t.initialStock + 1 WHERE t.id = :id")
+    void incrementStock(Integer id);
+
 }

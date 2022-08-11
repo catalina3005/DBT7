@@ -1,47 +1,51 @@
 package com.example.dbtema7.controller;
 import com.example.dbtema7.model.Product;
 import com.example.dbtema7.service.ProductService;
-import lombok.RequiredArgsConstructor;
+import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
-@RequiredArgsConstructor
+@Data
 @RequestMapping("products")
 public class ProductController {
-
-    private final ProductService productService;
+    @Autowired
+    ProductService productService;
 
     @GetMapping("/all")
-    public List<Product> getAll(){
-        return productService.getAll();
+    public List<Product> getAllProducts() {
+        return productService.getAllProducts();
     }
 
-    @GetMapping
-    public List<Product> getAllNoDeleted(){
-        return productService.getAllNoDeleted();
+    @PostMapping("/addProduct")
+    public void addProduct(@RequestBody Product product) {
+        productService.addProduct(product);
     }
 
-    @PostMapping
-    public void addProduct(@RequestBody Product product){
-        productService.insert(product);
+    @PostMapping("/updateProduct/{id}/{initialStock}")
+    public void updateProduct(@RequestBody @PathVariable("id") Integer productId,
+                              @PathVariable("initialStock") Integer initialStock) {
+        productService.updateProductStock(productId, initialStock);
     }
 
-    @PutMapping("increment/{id}")
-    public void incrementProduct(@PathVariable Integer id){
-        productService.incrementProduct(id);
+    @DeleteMapping("/deleteById/{id}")
+    public void deleteProduct(@PathVariable("id") Integer productId) {
+        productService.deleteProduct(productId);
     }
-    @PutMapping("decrement/{id}")
-    public void decrementProduct(@PathVariable Integer id){
-        productService.decrementProduct(id);
+
+    @PostMapping("/update/increment/{id}")
+    public void updateProductPlus(@PathVariable("id") Integer productId) {
+        productService.incrementStock(productId);
     }
-    @DeleteMapping("{id}")
-    public void deleteProduct(@PathVariable Integer id){
-        productService.delete(id);
+
+    @PostMapping("/update/decrement/{id}")
+    public void updateProductMinus(@PathVariable("id") Integer productId) {
+        productService.updateStock(productId);
     }
-    @PutMapping("/stockUpdate/{id}/{stock}")
-    public void stockUpdate(@PathVariable Integer id,@PathVariable Integer stock){
-        productService.stockUpdate(id, stock);
+
+    @GetMapping("/deleted")
+    public List<Product> getAllProductsAndDeleted(boolean isDeleted) {
+        return productService.findAllProducts(isDeleted);
     }
 }
