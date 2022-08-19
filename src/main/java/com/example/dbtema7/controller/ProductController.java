@@ -1,51 +1,50 @@
 package com.example.dbtema7.controller;
 import com.example.dbtema7.model.Product;
 import com.example.dbtema7.service.ProductService;
-import lombok.Data;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
-@Data
-@RequestMapping("products")
+@RequiredArgsConstructor
+@RequestMapping("product")
 public class ProductController {
-    @Autowired
-    ProductService productService;
+    private final ProductService productService;
+
+    @PostMapping("/addProduct")
+    public Product addProduct(@RequestBody Product product){
+        return productService.createProduct(product);
+    }
+
+    @PutMapping("/delete/{id}")
+    public void deleteProduct(@PathVariable Integer id){
+        productService.deleteProduct(id);
+    }
 
     @GetMapping("/all")
-    public List<Product> getAllProducts() {
+    public List<Product> getAllProducts(){
         return productService.getAllProducts();
     }
 
-    @PostMapping("/addProduct")
-    public void addProduct(@RequestBody Product product) {
-        productService.addProduct(product);
+
+    @GetMapping("/allTheProducts")
+    public List<Product> getAllTheProducts(){
+        return productService.getAllTheProducts();
     }
 
-    @PostMapping("/updateProduct/{id}/{initialStock}")
-    public void updateProduct(@RequestBody @PathVariable("id") Integer productId,
-                              @PathVariable("initialStock") Integer initialStock) {
-        productService.updateProductStock(productId, initialStock);
+    @PutMapping("/updateStock/id/{id}/stock")
+    public void updateStock(@PathVariable Integer id, @RequestParam Integer stock){
+        productService.updateStock(id, stock);
     }
 
-    @DeleteMapping("/deleteById/{id}")
-    public void deleteProduct(@PathVariable("id") Integer productId) {
-        productService.deleteProduct(productId);
+    @PutMapping("/increment/{id}")
+    public void incrementStock(@PathVariable Integer id){
+        productService.incrementStock(id);
     }
 
-    @PostMapping("/update/increment/{id}")
-    public void updateProductPlus(@PathVariable("id") Integer productId) {
-        productService.incrementStock(productId);
-    }
-
-    @PostMapping("/update/decrement/{id}")
-    public void updateProductMinus(@PathVariable("id") Integer productId) {
-        productService.updateStock(productId);
-    }
-
-    @GetMapping("/deleted")
-    public List<Product> getAllProductsAndDeleted(boolean isDeleted) {
-        return productService.findAllProducts(isDeleted);
+    @PutMapping("/decrement/{id}")
+    public void decrementStock(@PathVariable Integer id){
+        productService.decrementStock(id);
     }
 }

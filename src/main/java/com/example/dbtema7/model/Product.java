@@ -1,41 +1,44 @@
 package com.example.dbtema7.model;
+
 import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.*;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+
+import javax.persistence.*;
 
 @Entity
-
 @Data
-
 @NoArgsConstructor
-
 @AllArgsConstructor
-
-@Table(name = "table_product")
-
-@SQLDelete(sql = "UPDATE table_product SET deleted = true WHERE id=?")
-
-@Where(clause = "deleted=false")
-
-@FilterDef(name = "deletedProductFilter", parameters = @ParamDef(name = "isDeleted", type = "boolean"))
-
-@Filter(name = "deletedProductFilter", condition = "deleted = :isDeleted")
-
 public class Product {
-
     @Id
-    @GeneratedValue
-    Integer id;
-    @NotNull
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
-    String name;
-    Integer initialStock;
-    ProductType productType;
-    boolean deleted = Boolean.FALSE;
-}
+    @NotNull
+    private String name;
+
+    @NotNull
+    @Column(unique = true)
+    private String code;
+
+    @NotNull
+    private ProductType productType;
+
+    @NotNull
+    private Integer stock;
+
+    @Column(nullable = false)
+    private boolean deleted;
+
+    private Integer price;
+
+    public Product(String name, String code, ProductType productType, Integer stock, boolean deleted, Integer price) {
+        this.name = name;
+        this.code = code;
+        this.productType = productType;
+        this.stock = stock;
+        this.deleted = deleted;
+        this.price = price;
+    }}

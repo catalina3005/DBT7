@@ -1,62 +1,48 @@
 package com.example.dbtema7.service;
 import com.example.dbtema7.model.Product;
 import com.example.dbtema7.repository.ProductRepository;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.hibernate.Filter;
-import org.hibernate.Session;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@RequiredArgsConstructor
 public class ProductService {
-    @PersistenceContext
-    private EntityManager entityManager;
-    @Autowired
-    ProductRepository productRepository;
+    private final ProductRepository productRepository;
+
+    public Product createProduct(Product product){
+        return productRepository.save(product);
+    }
+
+    public void deleteProduct(Integer id){
+        productRepository.deleteById(id);
+    }
+
+    public List<Product> getTheProducts(){
+        return productRepository.findAll().stream()
+                .filter(product -> !product.isDeleted())
+                .collect(Collectors.toList());
+    }
 
     public List<Product> getAllProducts(){
         return productRepository.findAll();
     }
 
-    public void addProduct(Product product){
-        System.out.println(product);
-        productRepository.save(product);
-
+    public List<Product> getAllTheProducts(){
+        return productRepository.getAllTheProducts();
     }
 
-    public void updateProductStock(Integer productId,Integer initialStock){
-        productRepository.updateProduct(productId,initialStock);
+    public void updateStock(Integer id, Integer stock){
+        productRepository.updateStock(id,stock);
     }
 
-    public void deleteProduct(Integer productId){
-        productRepository.deleteById(productId);
+    public void incrementStock(Integer id){
+        productRepository.incrementStock(id);
     }
 
-    public List<Product> findAllProducts(boolean isDeleted){
-        Session session = entityManager.unwrap(Session.class);
-        Filter filter = session.enableFilter("deletedProductFilter");
-        filter.setParameter("isDeleted", isDeleted);
-        List<Product> products =  productRepository.findAll();
-        session.disableFilter("deletedProductFilter");
-        return products;
+    public void decrementStock(Integer id){
+        productRepository.decrementStock(id);
     }
-
-    public void incrementStock(Integer productId){
-        productRepository.incrementStock(productId);
-    }
-
-    public void updateStock(Integer productId){
-        productRepository.updateStock(productId);
-    }
-
-
-
 }
